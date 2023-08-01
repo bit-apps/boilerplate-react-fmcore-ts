@@ -12,6 +12,8 @@ import { store, persistor } from "./store/redux";
 import Router from "./router";
 
 import Loading from "./components/Loading/Loading";
+import { FMcoreProvider } from "./contexts/FMcoreContext";
+import { StoreProvider } from "./contexts/StoreContext";
 
 const themeConfig = {
   algorithm: theme.defaultAlgorithm,
@@ -25,19 +27,23 @@ const reactQueryClient = new QueryClient();
 const App = () => {
   return (
     <HelmetProvider>
-      <ReduxProvider store={store}>
-        <PersistGate loading={<Loading />} persistor={persistor}>
-          <AuthProvider>
-            <QueryClientProvider client={reactQueryClient}>
-              <ConfigProvider theme={themeConfig}>
-                <BrowserRouter>
-                  <Router />
-                </BrowserRouter>
-              </ConfigProvider>
-            </QueryClientProvider>
-          </AuthProvider>
-        </PersistGate>
-      </ReduxProvider>
+      <FMcoreProvider>
+        <ReduxProvider store={store}>
+          <PersistGate loading={<Loading />} persistor={persistor}>
+            <AuthProvider>
+              <QueryClientProvider client={reactQueryClient}>
+                <StoreProvider>
+                  <ConfigProvider theme={themeConfig}>
+                    <BrowserRouter>
+                      <Router />
+                    </BrowserRouter>
+                  </ConfigProvider>
+                </StoreProvider>
+              </QueryClientProvider>
+            </AuthProvider>
+          </PersistGate>
+        </ReduxProvider>
+      </FMcoreProvider>
     </HelmetProvider>
   );
 };

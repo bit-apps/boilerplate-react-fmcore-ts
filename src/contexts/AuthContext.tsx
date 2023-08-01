@@ -1,13 +1,8 @@
-import {
-  createContext,
-  FunctionComponent,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, FunctionComponent, ReactNode, useEffect, useMemo, useState } from "react";
 
 import { User } from "../types/user";
+import { useNavigate } from "react-router-dom";
+import useFMcore from "../hooks/useFMcore";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -15,8 +10,8 @@ interface AuthProviderProps {
 
 interface AuthContextType {
   isAuthenticated: boolean;
-
-  authenticateUser: (user: Partial<User>) => void;
+  user?: User | null;
+  authenticateUser: (user: User) => void;
   unAuthenticateUser: () => void;
   updateUser: () => void;
 }
@@ -33,11 +28,12 @@ const AuthContext = createContext(initialState);
 
 const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-
   const isAuthenticated = useMemo<boolean>(() => Boolean(user), [user]);
 
-  const authenticateUser = (user: Partial<User>) => {
-    //
+  const { FMcore } = useFMcore();
+
+  const authenticateUser = (user: User) => {
+    setUser(user);
   };
 
   const unAuthenticateUser = () => {
@@ -47,14 +43,15 @@ const AuthProvider: FunctionComponent<AuthProviderProps> = ({ children }) => {
   const updateUser = () => {};
 
   useEffect(() => {
-    updateUser();
-  }, []);
+    authenticateUser(FMcore.getUser());
+  }, [FMcore]);
 
   return (
     <AuthContext.Provider
       value={{
         ...initialState,
         isAuthenticated,
+        user,
         authenticateUser,
         unAuthenticateUser,
       }}
